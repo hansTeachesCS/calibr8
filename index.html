@@ -70,14 +70,16 @@ body{background:var(--bg);color:var(--navy-mid);min-height:100vh;font-family:-ap
 /* ── MOBILE FIELDS ── */
 .mobile-fields{
   display:none;
-  padding:12px 1rem;
+  padding:10px 1rem;
   background:var(--navy-mid);
   gap:8px;
   border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-direction:column;
 }
 .mobile-fields input{
-  flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
-  color:white;padding:7px 11px;border-radius:var(--r-sm);font-size:13px;font-family:inherit;
+  width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
+  color:white;padding:8px 12px;border-radius:var(--r-sm);font-size:14px;font-family:inherit;
+  box-sizing:border-box;
 }
 .mobile-fields input::placeholder{color:rgba(255,255,255,0.32);}
 .mobile-fields input:focus{outline:none;border-color:rgba(255,255,255,0.32);}
@@ -328,7 +330,7 @@ kbd{
     </svg>
     <div class="logo-text">
       <div class="logo-name">CALIBR<span class="c8">8</span></div>
-      <div class="logo-sub">Calibrate your eye · Master the Danielson Great 8</div>
+      <div class="logo-sub">Calibrate Your Eye · Master the Danielson Great 8</div>
     </div>
   </div>
   <div class="header-fields">
@@ -590,7 +592,7 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
 });
 
 // ── CLASSIFY ──
-const WORKER_URL = "https://calibr8.joshuaehans.workers.dev/classify";
+const WORKER_URL = "https://YOUR-WORKER-NAME.workers.dev/classify"; // 👈 replace with your Worker URL
 document.getElementById('classifyBtn').addEventListener('click',runClassify);
 document.getElementById('addPostNote').addEventListener('click',()=>{
   const inp=document.getElementById('postNoteInput');
