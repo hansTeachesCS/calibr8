@@ -53,37 +53,22 @@ body{background:var(--bg);color:var(--navy-mid);min-height:100vh;font-family:-ap
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .logo-sub{font-size:10.5px;color:rgba(255,255,255,0.38);letter-spacing:0.04em;margin-top:1px;}
-.header-fields{display:flex;gap:8px;align-items:center;}
-.header-fields input{
-  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
-  color:white;padding:6px 11px;border-radius:var(--r-sm);
-  font-size:13px;width:150px;font-family:inherit;
-}
-.header-fields input::placeholder{color:rgba(255,255,255,0.32);}
-.header-fields input:focus{outline:none;border-color:rgba(255,255,255,0.32);}
 @media(max-width:600px){
-  .header-fields{display:none;}
-  .logo-sub{display:none;}
-  .logo-name{font-size:20px;}
+  .logo-name{font-size:18px;}
+  .logo-sub{font-size:9px;letter-spacing:0.02em;}
 }
 
 /* ── MOBILE FIELDS ── */
-.mobile-fields{
-  display:none;
-  padding:10px 1rem;
-  background:var(--navy-mid);
-  gap:8px;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  flex-direction:column;
+/* observation meta fields */
+.obs-meta{display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.obs-meta input{
+  flex:1;min-width:140px;padding:9px 14px;
+  border:1px solid var(--border);border-radius:var(--r-sm);
+  font-size:14px;font-family:inherit;color:var(--navy-mid);
+  background:var(--white);
 }
-.mobile-fields input{
-  width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
-  color:white;padding:8px 12px;border-radius:var(--r-sm);font-size:14px;font-family:inherit;
-  box-sizing:border-box;
-}
-.mobile-fields input::placeholder{color:rgba(255,255,255,0.32);}
-.mobile-fields input:focus{outline:none;border-color:rgba(255,255,255,0.32);}
-@media(max-width:600px){.mobile-fields{display:flex;}}
+.obs-meta input::placeholder{color:var(--mist);}
+.obs-meta input:focus{outline:none;border-color:var(--navy-lit);}
 
 /* ── CLUSTER BAR ── */
 .cluster-bar{
@@ -333,17 +318,8 @@ kbd{
       <div class="logo-sub">Calibrate Your Eye · Master the Danielson Great 8</div>
     </div>
   </div>
-  <div class="header-fields">
-    <input type="text" id="teacherName" placeholder="Teacher name"/>
-    <input type="text" id="classInfo" placeholder="Class / period"/>
-  </div>
-</header>
 
-<!-- MOBILE FIELDS -->
-<div class="mobile-fields">
-  <input type="text" id="teacherNameM" placeholder="Teacher name"/>
-  <input type="text" id="classInfoM" placeholder="Class / period"/>
-</div>
+</header>
 
 <!-- CLUSTER BAR -->
 <div class="cluster-bar">
@@ -354,6 +330,12 @@ kbd{
 </div>
 
 <main class="main">
+
+  <!-- OBS META -->
+  <div class="obs-meta">
+    <input type="text" id="teacherName" placeholder="Teacher name"/>
+    <input type="text" id="classInfo" placeholder="Class / period"/>
+  </div>
 
   <!-- CAPTURE -->
   <div class="section-label">Capture</div>
@@ -546,10 +528,10 @@ function highlight(text,kws){
   return r;
 }
 function getTeacher(){
-  return (document.getElementById('teacherName').value||document.getElementById('teacherNameM').value||'').trim();
+  return (document.getElementById('teacherName').value||'').trim();
 }
 function getClass(){
-  return (document.getElementById('classInfo').value||document.getElementById('classInfoM').value||'').trim();
+  return (document.getElementById('classInfo').value||'').trim();
 }
 function updateBadge(){
   document.getElementById('noteCountBadge').textContent=notes.length+' note'+(notes.length!==1?'s':'');
@@ -734,7 +716,6 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
   document.querySelectorAll('.domain-col').forEach(col=>{
     const code=col.dataset.domain;
     const cards=col.querySelectorAll('.obs-card');
-    out+=`\n[${code.toUpperCase()}] ${DOMAINS[code]?DOMAINS[code].label:code}\n`;
     if(!cards.length){out+=`  — No observations\n`;}
     else{cards.forEach(c=>{
       const ts=c.querySelector('.obs-ts').textContent;
@@ -751,13 +732,7 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
   a.click();
 });
 
-// sync mobile fields to desktop
-['teacherNameM','classInfoM'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',e=>{
-    const target=id==='teacherNameM'?'teacherName':'classInfo';
-    document.getElementById(target).value=e.target.value;
-  });
-});
+
 </script>
 </body>
 </html>
