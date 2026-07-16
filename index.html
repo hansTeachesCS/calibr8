@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Calibr8 — Master the Danielson Great 8</title>
+<style>
+:root {
+  --navy:     #0f1623;
+  --navy-mid: #1e2535;
+  --navy-lit: #2d3748;
+  --slate:    #64748b;
+  --mist:     #94a3b8;
+  --border:   #e2e8f0;
+  --bg:       #f8f7f4;
+  --white:    #ffffff;
+
+  --planning: #6366f1;
+  --env:      #0d9488;
+  --instr:    #d97706;
+  --prof:     #db2777;
+
+  --pos-bg:  #dbeafe; --pos-bd: #3b82f6; --pos-tx: #1e40af;
+  --neg-bg:  #fee2e2; --neg-bd: #ef4444; --neg-tx: #991b1b;
+  --neu-bg:  #f1f5f9; --neu-bd: #94a3b8; --neu-tx: #334155;
+
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --sh-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --sh-md: 0 4px 16px rgba(0,0,0,0.13);
+  --sh-drag: 0 12px 32px rgba(0,0,0,0.22);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--navy-mid);min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;}
+
+/* ── HEADER ── */
+.app-header{
+  background:var(--navy);
+  padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;position:sticky;top:0;z-index:200;
+  box-shadow:0 1px 0 rgba(255,255,255,0.06),0 2px 12px rgba(0,0,0,0.3);
+}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{width:38px;height:38px;flex-shrink:0;}
+.logo-text{display:flex;flex-direction:column;line-height:1.1;}
+.logo-name{
+  font-size:22px;font-weight:800;letter-spacing:-1px;color:white;
+  display:flex;align-items:baseline;gap:0;
+}
+.logo-name .c8{
+  background:linear-gradient(135deg,#818cf8,#2dd4bf);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:10.5px;color:rgba(255,255,255,0.38);letter-spacing:0.04em;margin-top:1px;}
+.header-fields{display:flex;gap:8px;align-items:center;}
+.header-fields input{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
+  color:white;padding:6px 11px;border-radius:var(--r-sm);
+  font-size:13px;width:150px;font-family:inherit;
+}
+.header-fields input::placeholder{color:rgba(255,255,255,0.32);}
+.header-fields input:focus{outline:none;border-color:rgba(255,255,255,0.32);}
+@media(max-width:600px){
+  .header-fields{display:none;}
+  .logo-sub{display:none;}
+  .logo-name{font-size:20px;}
+}
+
+/* ── MOBILE FIELDS ── */
+.mobile-fields{
+  display:none;
+  padding:12px 1rem;
+  background:var(--navy-mid);
+  gap:8px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.mobile-fields input{
+  flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.13);
+  color:white;padding:7px 11px;border-radius:var(--r-sm);font-size:13px;font-family:inherit;
+}
+.mobile-fields input::placeholder{color:rgba(255,255,255,0.32);}
+.mobile-fields input:focus{outline:none;border-color:rgba(255,255,255,0.32);}
+@media(max-width:600px){.mobile-fields{display:flex;}}
+
+/* ── CLUSTER BAR ── */
+.cluster-bar{
+  background:var(--navy-mid);
+  padding:0 1.5rem;
+  display:flex;gap:6px;align-items:center;
+  height:36px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  overflow-x:auto;
+}
+.cluster-pill{
+  display:inline-flex;align-items:center;
+  padding:3px 10px;border-radius:20px;
+  font-size:10.5px;font-weight:600;white-space:nowrap;
+  border:1px solid transparent;
+}
+.cp-planning{background:#6366f118;border-color:#6366f135;color:#818cf8;}
+.cp-env     {background:#0d948818;border-color:#0d948835;color:#2dd4bf;}
+.cp-instr   {background:#d9770618;border-color:#d9770635;color:#fbbf24;}
+.cp-prof    {background:#db277718;border-color:#db277735;color:#f472b6;}
+
+/* ── MAIN ── */
+.main{max-width:1120px;margin:0 auto;padding:1.75rem 1.25rem 4rem;}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--mist);margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── PANELS ── */
+.panel{
+  background:var(--white);border-radius:var(--r-lg);
+  box-shadow:var(--sh-sm);border:1px solid var(--border);
+  margin-bottom:1.25rem;overflow:hidden;
+}
+.panel-header{
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:13px;font-weight:600;color:var(--slate);text-transform:uppercase;letter-spacing:0.06em;}
+
+/* ── CAPTURE ── */
+#noteInput{
+  width:100%;min-height:96px;padding:14px 18px;
+  border:none;font-size:15px;line-height:1.65;
+  color:var(--navy-mid);background:transparent;resize:none;font-family:inherit;
+}
+#noteInput:focus{outline:none;}
+#noteInput::placeholder{color:var(--mist);}
+.capture-footer{
+  padding:9px 18px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;flex-wrap:nowrap;
+}
+.hint{font-size:12px;color:var(--mist);white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.hint-divider{color:var(--border);font-size:12px;}
+kbd{
+  background:var(--bg);color:var(--slate);border:1px solid var(--border);
+  border-radius:4px;padding:1px 5px;font-family:inherit;font-size:11px;
+}
+.note-badge{
+  background:var(--navy);color:white;
+  font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;
+}
+
+/* ── LOG ── */
+.legend{display:flex;gap:12px;align-items:center;font-size:12px;color:var(--slate);}
+.legend-item{display:flex;align-items:center;gap:4px;}
+.ldot{width:9px;height:9px;border-radius:50%;}
+.log-body{max-height:220px;overflow-y:auto;}
+.log-empty{padding:24px;text-align:center;color:var(--mist);font-size:13px;font-style:italic;}
+.log-entry{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 18px;border-bottom:1px solid var(--border);transition:background 0.12s;
+}
+.log-entry:last-child{border-bottom:none;}
+.log-entry:hover{background:var(--bg);}
+.sdot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.sdot.pos{background:var(--pos-bd);}
+.sdot.neg{background:var(--neg-bd);}
+.sdot.neu{background:var(--mist);}
+.log-ts{
+  font-family:'SF Mono','Fira Mono','Courier New',monospace;
+  font-size:11px;color:var(--mist);white-space:nowrap;padding-top:1px;min-width:70px;
+}
+.log-text{font-size:13px;color:var(--navy-lit);line-height:1.5;flex:1;}
+
+/* ── ACTION BAR ── */
+.action-bar{display:flex;gap:8px;margin-bottom:1.75rem;flex-wrap:wrap;}
+.btn{
+  padding:9px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.btn-primary{background:var(--navy);color:white;}
+.btn-primary:hover{background:#0d1220;transform:translateY(-1px);box-shadow:var(--sh-md);}
+.btn-ghost{background:transparent;color:#ef4444;border:1px solid #fca5a5;}
+.btn-ghost:hover{background:#fef2f2;}
+.btn-outline{background:var(--white);color:var(--navy-lit);border:1px solid var(--border);}
+.btn-outline:hover{background:var(--bg);}
+.ml-auto{margin-left:auto;}
+
+/* ── ERROR ── */
+.classify-error{display:none;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#991b1b;font-size:13px;margin-bottom:1rem;}
+
+/* ── RESULTS ── */
+.results-section{display:none;}
+.results-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;
+}
+.results-title{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-0.3px;}
+.results-sub{font-size:13px;color:var(--slate);margin-top:3px;}
+
+/* ── DOMAIN KANBAN ── */
+.domain-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:1.5rem;
+}
+@media(max-width:860px){.domain-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.domain-grid{grid-template-columns:1fr;}}
+
+.domain-col{
+  background:var(--white);border-radius:var(--r-lg);
+  border:1px solid var(--border);overflow:hidden;
+  min-height:160px;transition:box-shadow 0.18s,border-color 0.18s;
+}
+.domain-col.drag-over{box-shadow:0 0 0 2px var(--planning);border-color:var(--planning);}
+.domain-col-header{
+  padding:11px 13px 9px;border-bottom:1px solid var(--border);
+  border-top:3px solid transparent;
+}
+.domain-col-header.planning{border-top-color:var(--planning);}
+.domain-col-header.env     {border-top-color:var(--env);}
+.domain-col-header.instr   {border-top-color:var(--instr);}
+.domain-col-header.prof    {border-top-color:var(--prof);}
+
+.domain-code{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}
+.domain-code.planning{color:var(--planning);}
+.domain-code.env     {color:var(--env);}
+.domain-code.instr   {color:var(--instr);}
+.domain-code.prof    {color:var(--prof);}
+.domain-name{font-size:12px;font-weight:600;color:var(--navy-lit);line-height:1.3;}
+.domain-comp{font-size:10.5px;color:var(--mist);margin-top:1px;}
+
+.domain-cards{padding:9px;min-height:80px;display:flex;flex-direction:column;gap:6px;}
+.domain-empty{
+  font-size:12px;color:var(--mist);font-style:italic;
+  text-align:center;padding:14px 6px;
+}
+
+/* ── OBS CARDS ── */
+.obs-card{
+  border-radius:var(--r-sm);padding:7px 9px;font-size:12px;line-height:1.5;
+  cursor:grab;transition:box-shadow 0.14s,transform 0.14s;
+  border-left:3px solid transparent;position:relative;user-select:none;
+}
+.obs-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px);}
+.obs-card:active{cursor:grabbing;}
+.obs-card.dragging{opacity:0.35;}
+.obs-card.pos{background:var(--pos-bg);border-left-color:var(--pos-bd);color:var(--pos-tx);}
+.obs-card.neg{background:var(--neg-bg);border-left-color:var(--neg-bd);color:var(--neg-tx);}
+.obs-card.neu{background:var(--neu-bg);border-left-color:var(--neu-bd);color:var(--neu-tx);}
+.obs-ts{font-family:'SF Mono','Fira Mono','Courier New',monospace;font-size:10px;opacity:0.55;margin-bottom:2px;display:block;}
+.obs-text{display:block;word-break:break-word;}
+.kw{font-weight:700;text-decoration:underline;text-decoration-style:dotted;}
+.drag-handle{position:absolute;top:5px;right:6px;opacity:0;font-size:11px;transition:opacity 0.14s;}
+.obs-card:hover .drag-handle{opacity:0.4;}
+
+/* ── DRAG GHOST ── */
+.drag-ghost{
+  position:fixed;pointer-events:none;z-index:9999;
+  opacity:0.88;transform:rotate(2deg) scale(1.05);
+  box-shadow:var(--sh-drag);max-width:200px;
+}
+
+/* ── UNCLASSIFIED ── */
+.unclassified-panel{
+  background:var(--white);border:1px dashed var(--border);
+  border-radius:var(--r-lg);margin-bottom:1.25rem;overflow:hidden;
+}
+.unclassified-hdr{
+  padding:9px 15px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border);
+}
+.unclassified-hdr h3{font-size:13px;font-weight:600;color:var(--slate);}
+.unclassified-cards{padding:10px 13px;display:flex;flex-wrap:wrap;gap:7px;min-height:56px;}
+
+/* ── POST NOTES ── */
+#postNoteInput{
+  width:100%;padding:13px 18px;border:none;resize:none;
+  font-size:14px;line-height:1.6;color:var(--navy-mid);background:transparent;
+  font-family:inherit;min-height:76px;
+}
+#postNoteInput:focus{outline:none;}
+#postNoteInput::placeholder{color:var(--mist);}
+.post-footer{padding:8px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;}
+
+/* ── FOOTER ── */
+.app-footer{
+  text-align:center;font-size:11.5px;color:var(--mist);
+  padding:1.5rem 1rem;border-top:1px solid var(--border);margin-top:2rem;
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+}
+.footer-logo{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--slate);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="logo">
+    <!-- Inline SVG icon: open book + pencil -->
+    <svg class="logo-icon" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="spineG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6366f1"/>
+          <stop offset="100%" stop-color="#0d9488"/>
+        </linearGradient>
+      </defs>
+      <!-- left page -->
+      <path d="M4 8 C4 6.9 4.9 6 6 6 L18 6 L18 32 L6 32 C4.9 32 4 31.1 4 30 Z" fill="#1e2d45" stroke="#6366f1" stroke-width="1.2"/>
+      <line x1="7" y1="12" x2="15" y2="12" stroke="#6366f1" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="7" y1="16" x2="15" y2="16" stroke="#6366f1" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="7" y1="20" x2="15" y2="20" stroke="#6366f1" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="7" y1="24" x2="12" y2="24" stroke="#6366f1" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <!-- right page -->
+      <path d="M20 6 L32 6 C33.1 6 34 6.9 34 8 L34 30 C34 31.1 33.1 32 32 32 L20 32 Z" fill="#1e2d45" stroke="#0d9488" stroke-width="1.2"/>
+      <line x1="23" y1="12" x2="31" y2="12" stroke="#0d9488" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="23" y1="16" x2="31" y2="16" stroke="#0d9488" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="23" y1="20" x2="31" y2="20" stroke="#0d9488" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <line x1="23" y1="24" x2="28" y2="24" stroke="#0d9488" stroke-width="1.1" stroke-linecap="round" opacity="0.7"/>
+      <!-- spine -->
+      <rect x="18" y="6" width="2" height="26" fill="url(#spineG)" rx="1"/>
+      <!-- pencil -->
+      <g transform="translate(26,4) rotate(38)">
+        <rect x="-2" y="-14" width="4" height="20" fill="#fbbf24" rx="0.8"/>
+        <rect x="-2" y="-18" width="4" height="5" fill="#f87171" rx="0.8"/>
+        <polygon points="-2,6 2,6 0,13" fill="#e2c799"/>
+        <polygon points="-0.8,10 0.8,10 0,13" fill="#374151"/>
+      </g>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-name">CALIBR<span class="c8">8</span></div>
+      <div class="logo-sub">Calibrate your eye · Master the Danielson Great 8</div>
+    </div>
+  </div>
+  <div class="header-fields">
+    <input type="text" id="teacherName" placeholder="Teacher name"/>
+    <input type="text" id="classInfo" placeholder="Class / period"/>
+  </div>
+</header>
+
+<!-- MOBILE FIELDS -->
+<div class="mobile-fields">
+  <input type="text" id="teacherNameM" placeholder="Teacher name"/>
+  <input type="text" id="classInfoM" placeholder="Class / period"/>
+</div>
+
+<!-- CLUSTER BAR -->
+<div class="cluster-bar">
+  <span class="cluster-pill cp-planning">Planning</span>
+  <span class="cluster-pill cp-env">Environment</span>
+  <span class="cluster-pill cp-instr">Instruction</span>
+  <span class="cluster-pill cp-prof">Professionalism</span>
+</div>
+
+<main class="main">
+
+  <!-- CAPTURE -->
+  <div class="section-label">Capture</div>
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Low-inference notes</span>
+      <span class="note-badge" id="noteCountBadge">0 notes</span>
+    </div>
+    <textarea id="noteInput" placeholder="Start typing your low-inference observation… press Enter to log each note with a timestamp."></textarea>
+    <div class="capture-footer">
+      <span class="hint"><kbd>Enter</kbd> log &amp; timestamp</span>
+      <span class="hint-divider">·</span>
+      <span class="hint"><kbd>Shift+Enter</kbd> line break</span>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="section-label">Timestamped log</div>
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Field notes</span>
+      <div class="legend">
+        <div class="legend-item"><div class="ldot" style="background:var(--pos-bd)"></div>Positive</div>
+        <div class="legend-item"><div class="ldot" style="background:var(--neg-bd)"></div>Negative</div>
+        <div class="legend-item"><div class="ldot" style="background:var(--mist)"></div>Neutral</div>
+      </div>
+    </div>
+    <div class="log-body" id="logBody">
+      <div class="log-empty">Notes will appear here as you type…</div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="action-bar">
+    <button class="btn btn-primary" id="classifyBtn">&#9680;&nbsp; Classify with Danielson</button>
+    <button class="btn btn-ghost" id="clearBtn">&#x2715;&nbsp; Clear all</button>
+    <button class="btn btn-outline ml-auto" id="exportBtn" style="display:none">&#8595;&nbsp; Export report</button>
+  </div>
+
+  <div id="classifyError" style="display:none;padding:10px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;color:#991b1b;font-size:13px;margin-bottom:1rem;"></div>
+
+  <!-- RESULTS -->
+  <div class="results-section" id="resultsSection">
+
+    <div class="results-header">
+      <div>
+        <div class="results-title">Danielson Classification</div>
+        <div class="results-sub" id="resultsSub"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Domain breakdown</div>
+    <div class="domain-grid" id="domainGrid"></div>
+
+    <div class="unclassified-panel" id="unclassifiedSection" style="display:none">
+      <div class="unclassified-hdr">
+        <span>⚠</span>
+        <h3>Unclassified — drag to the correct domain</h3>
+      </div>
+      <div class="unclassified-cards" id="unclassifiedCards" data-domain="unclassified"></div>
+    </div>
+
+    <div class="section-label">Post-observation</div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Notes &amp; reflections</span>
+      </div>
+      <textarea id="postNoteInput" placeholder="Add follow-up notes, coaching points, or observer reflections here…"></textarea>
+      <div class="post-footer">
+        <button class="btn btn-outline" id="addPostNote">Add to log &amp; re-classify</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="app-footer">
+  <div class="footer-logo">
+    <svg width="18" height="18" viewBox="0 0 38 38" fill="none">
+      <defs>
+        <linearGradient id="fg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#0d9488"/>
+        </linearGradient>
+      </defs>
+      <path d="M4 8C4 6.9 4.9 6 6 6H18V32H6C4.9 32 4 31.1 4 30Z" fill="#1e2d45" stroke="#6366f1" stroke-width="1.2"/>
+      <path d="M20 6H32C33.1 6 34 6.9 34 8V30C34 31.1 33.1 32 32 32H20Z" fill="#1e2d45" stroke="#0d9488" stroke-width="1.2"/>
+      <rect x="18" y="6" width="2" height="26" fill="url(#fg2)" rx="1"/>
+    </svg>
+    CALIBR8
+  </div>
+  <span>Danielson Framework for Teaching</span>
+  <span>·</span>
+  <span>Domains 1a · 1e · 2a · 2d · 3b · 3c · 3d · 4e</span>
+</footer>
+
+<script>
+// ── DATA ──
+const DOMAINS = {
+  "1a":{ label:"Knowledge of content & pedagogy", comp:"Planning", cluster:"planning",
+    kw:["misconception","prior knowledge","prerequisite","content knowledge","subject matter",
+    "discipline","vocabulary","academic language","terminology","definition","incorrect","error",
+    "accurate","inaccurate","explains why","connects to","background knowledge","schema",
+    "content area","cross-curricular","interdisciplinary","pedagogical","approach","strategy tied to",
+    "evidence-based","research-based","links concept","real world","application","makes connection"]},
+  "1e":{ label:"Designing coherent instruction", comp:"Planning", cluster:"planning",
+    kw:["objective","learning goal","aim","agenda","lesson plan","sequence","structure",
+    "do now","warm up","hook","launch","close","exit ticket","closure","transition","next step",
+    "material","resource","handout","worksheet","slide","activity","task","grouping",
+    "partner","small group","whole class","independent","scaffold","differentiat",
+    "pacing","timing","time allotted","unit","lesson arc","aligned","coherent","flow",
+    "progression","chunked","broken down","structured"]},
+  "2a":{ label:"Respect & rapport", comp:"Environment", cluster:"env",
+    kw:["respect","rapport","relationship","warmth","kind","affirm","acknowledge","celebrate",
+    "encouragement","praise","greet","welcome","inclusive","belong","dignity","tone","caring",
+    "student voice","listen","heard","valued","safe","supportive","eye contact","smile","humor",
+    "class community","culture","norm","trust","comfort","peer interaction","teamwork"]},
+  "2d":{ label:"Managing student behavior", comp:"Environment", cluster:"env",
+    kw:["behavior","off task","on task","distract","disrupt","redirect","refocus",
+    "consequence","warning","remind","expectation","rule","routine","procedure",
+    "transition","noise level","voice level","quiet","loud","side conversation",
+    "phone","device","signal","hand signal","call and response","timer",
+    "proximity","move to","nonverbal","cue","management","discipline","misbehav",
+    "comply","follow direction","push back","defiant","escalat","deescalat","calm","reset"]},
+  "3b":{ label:"Questioning & discussion", comp:"Instruction", cluster:"instr",
+    kw:["question","ask","inquiry","prompt","open-ended","higher order","lower order",
+    "bloom","analyze","evaluate","synthesize","create","apply","wait time","think time",
+    "cold call","equity stick","popsicle stick","volunteer","raise hand",
+    "discuss","discussion","turn and talk","think pair share","accountable talk",
+    "rephrase","repeat","add on","agree","disagree","debate","argue","defend","justify",
+    "explain your thinking","why","how do you know","probe","follow up","clarif",
+    "elaborate","build on","discourse","facilitate","whole group share"]},
+  "3c":{ label:"Engaging students in learning", comp:"Instruction", cluster:"instr",
+    kw:["engag","participat","on task","active","attentive","interest","motivat","enthus",
+    "hands up","volunteer","working","writing","reading","doing","attempt","try",
+    "student work","energy","momentum","invest","agency","choice","student-led",
+    "ownership","independ","collaborat","group work","partner work","all students",
+    "most students","some students","few students","majority","everyone","rigor",
+    "challenge","intellectually","grapple","struggle","productive struggle"]},
+  "3d":{ label:"Using assessment in instruction", comp:"Instruction", cluster:"instr",
+    kw:["circulate","walk around","monitor","check","scan","observe student work",
+    "formative","assess","exit ticket","thumbs","fist to five","whiteboard","show me",
+    "check for understanding","quiz","poll","clicker","response",
+    "feedback","comment","correct","misconception","reteach","adjust","pivot","modify",
+    "based on student","data","evidence","student response","who got","how many",
+    "annotate","mark","review","look at","examine work","exemplar","criteria","rubric"]},
+  "4e":{ label:"Growing professionally", comp:"Professionalism", cluster:"prof",
+    kw:["professional development","pd","workshop","conference","training","course",
+    "research","article","book","reflect","reflection","colleague","collaborat",
+    "department","team","coach","mentor","new strategy","new technique","new approach",
+    "trying","experimenting","pilot","best practice","literature","evidence-based",
+    "data-driven","inquiry","action research","grow","improve","refine","lesson study"]}
+};
+
+const POS_WORDS=["praise","celebrate","affirm","acknowledge","encourage","smile","warmth","kind","caring",
+  "inclusive","safe","supportive","trust","valued","heard","belong","welcome","greet","rapport",
+  "all students","most students","majority","everyone","engag","active","enthus","motivat",
+  "volunteer","participat","on task","working","doing","productive","invest","rigor","grapple",
+  "attempt","accurate","correct","understood","explain","justify","defend","elaborate","achieve"];
+const NEG_WORDS=["off task","distract","disrupt","redirect","misbehav","defiant","escalat","consequence",
+  "warning","loud","side conversation","phone","device","push back","not follow","incorrect","error",
+  "inaccurate","misconception","few students","quiet","refocus","noise","management","pause",
+  "not engag","not participat","confusion","lost","behind","slow","incomplete"];
+
+let notes=[];
+let dragCard=null,ghost=null;
+
+function getTime(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function sentiment(t){
+  const l=t.toLowerCase();
+  let p=0,n=0;
+  POS_WORDS.forEach(w=>{if(l.includes(w))p++;});
+  NEG_WORDS.forEach(w=>{if(l.includes(w))n++;});
+  return p>n?'pos':n>p?'neg':'neu';
+}
+function classify(text){
+  const l=text.toLowerCase(),out={};
+  for(const[d,data] of Object.entries(DOMAINS)){
+    const hits=data.kw.filter(k=>l.includes(k.toLowerCase()));
+    if(hits.length)out[d]=hits;
+  }
+  return out;
+}
+function highlight(text,kws){
+  let r=esc(text);
+  [...kws].sort((a,b)=>b.length-a.length).forEach(k=>{
+    const safe=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    r=r.replace(new RegExp('('+safe+')','gi'),'<span class="kw">$1</span>');
+  });
+  return r;
+}
+function getTeacher(){
+  return (document.getElementById('teacherName').value||document.getElementById('teacherNameM').value||'').trim();
+}
+function getClass(){
+  return (document.getElementById('classInfo').value||document.getElementById('classInfoM').value||'').trim();
+}
+function updateBadge(){
+  document.getElementById('noteCountBadge').textContent=notes.length+' note'+(notes.length!==1?'s':'');
+}
+
+// ── LOG ──
+function renderLog(){
+  const b=document.getElementById('logBody');
+  if(!notes.length){b.innerHTML='<div class="log-empty">Notes will appear here as you type…</div>';return;}
+  b.innerHTML=notes.map(n=>`<div class="log-entry">
+    <div class="sdot ${n.s}"></div>
+    <span class="log-ts">${n.time}</span>
+    <span class="log-text">${esc(n.text)}</span>
+  </div>`).join('');
+  b.scrollTop=b.scrollHeight;
+  updateBadge();
+}
+
+// ── INPUT ──
+document.getElementById('noteInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    const t=e.target.value.trim();
+    if(!t)return;
+    notes.push({time:getTime(),text:t,s:sentiment(t)});
+    e.target.value='';
+    renderLog();
+  }
+});
+
+// ── CLEAR ──
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  if(!notes.length)return;
+  if(!confirm('Clear all notes and reset?'))return;
+  notes=[];
+  renderLog();
+  document.getElementById('resultsSection').style.display='none';
+  document.getElementById('exportBtn').style.display='none';
+  updateBadge();
+});
+
+// ── CLASSIFY ──
+const WORKER_URL = "https://YOUR-WORKER-NAME.workers.dev/classify"; // 👈 replace with your Worker URL
+document.getElementById('classifyBtn').addEventListener('click',runClassify);
+document.getElementById('addPostNote').addEventListener('click',()=>{
+  const inp=document.getElementById('postNoteInput');
+  const t=inp.value.trim();
+  if(t){notes.push({time:getTime(),text:t,s:sentiment(t)});inp.value='';renderLog();}
+  runClassify();
+});
+
+function runClassify(){
+  if(!notes.length){alert('Add at least one note before classifying.');return;}
+  const enriched=notes.map((n,i)=>({...n,idx:i+1,domains:classify(n.text)}));
+  const dmap={};
+  Object.keys(DOMAINS).forEach(d=>dmap[d]=[]);
+  enriched.forEach(n=>Object.keys(n.domains).forEach(d=>dmap[d].push(n)));
+  const unclass=enriched.filter(n=>!Object.keys(n.domains).length);
+  const active=Object.keys(DOMAINS).filter(d=>dmap[d].length);
+
+  buildKanban(dmap,unclass);
+
+  const teacher=getTeacher()||'Teacher';
+  const cls=getClass();
+  document.getElementById('resultsSub').textContent=
+    `${teacher}${cls?' · '+cls:''} · ${notes.length} note${notes.length!==1?'s':''} across ${active.length} domain${active.length!==1?'s':''}`;
+
+  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('exportBtn').style.display='inline-flex';
+  setTimeout(()=>document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
+
+// ── KANBAN ──
+function buildKanban(dmap,unclass){
+  const grid=document.getElementById('domainGrid');
+  grid.innerHTML='';
+  Object.entries(DOMAINS).forEach(([code,data])=>{
+    const col=document.createElement('div');
+    col.className='domain-col';col.dataset.domain=code;
+
+    const hdr=document.createElement('div');
+    hdr.className=`domain-col-header ${data.cluster}`;
+    hdr.innerHTML=`<div class="domain-code ${data.cluster}">${code}</div>
+      <div class="domain-name">${data.label}</div>
+      <div class="domain-comp">${data.comp}</div>`;
+    col.appendChild(hdr);
+
+    const cards=document.createElement('div');
+    cards.className='domain-cards';cards.dataset.domain=code;
+    const items=dmap[code];
+    if(!items.length){cards.innerHTML='<div class="domain-empty">No observations</div>';}
+    else{items.forEach(n=>cards.appendChild(makeCard(n,code)));}
+    col.appendChild(cards);
+    setupDrop(cards);
+    grid.appendChild(col);
+  });
+
+  const us=document.getElementById('unclassifiedSection');
+  const uc=document.getElementById('unclassifiedCards');
+  if(unclass.length){
+    uc.innerHTML='';
+    unclass.forEach(n=>uc.appendChild(makeCard(n,null)));
+    setupDrop(uc);
+    us.style.display='block';
+  } else {us.style.display='none';}
+}
+
+function makeCard(note,domain){
+  const c=document.createElement('div');
+  c.className=`obs-card ${note.s}`;
+  c.draggable=true;c.dataset.idx=note.idx;
+  const kws=domain?(note.domains[domain]||[]):[];
+  c.innerHTML=`<span class="obs-ts">${note.time}</span>
+    <span class="obs-text">${highlight(note.text,kws)}</span>
+    <span class="drag-handle">⠿</span>`;
+  setupDrag(c);
+  return c;
+}
+
+// ── DRAG ──
+function setupDrag(card){
+  card.addEventListener('dragstart',e=>{
+    dragCard=card;card.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');
+    ghost=card.cloneNode(true);
+    ghost.className=card.className.replace('dragging','')+' drag-ghost';
+    ghost.style.width=card.offsetWidth+'px';
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost,ghost.offsetWidth/2,18);
+  });
+  card.addEventListener('dragend',()=>{
+    card.classList.remove('dragging');
+    if(ghost){ghost.remove();ghost=null;}
+    document.querySelectorAll('.domain-col,.unclassified-panel').forEach(c=>c.classList.remove('drag-over'));
+  });
+}
+function setupDrop(container){
+  container.addEventListener('dragover',e=>{
+    e.preventDefault();e.dataTransfer.dropEffect='move';
+    const p=container.closest('.domain-col,.unclassified-panel');
+    if(p)p.classList.add('drag-over');
+  });
+  container.addEventListener('dragleave',e=>{
+    if(!container.contains(e.relatedTarget)){
+      const p=container.closest('.domain-col,.unclassified-panel');
+      if(p)p.classList.remove('drag-over');
+    }
+  });
+  container.addEventListener('drop',e=>{
+    e.preventDefault();
+    const p=container.closest('.domain-col,.unclassified-panel');
+    if(p)p.classList.remove('drag-over');
+    if(!dragCard||container.contains(dragCard))return;
+    const emp=container.querySelector('.domain-empty');if(emp)emp.remove();
+    container.appendChild(dragCard);
+    document.querySelectorAll('.domain-cards').forEach(c=>{
+      if(c!==container&&!c.querySelector('.obs-card')&&!c.querySelector('.domain-empty'))
+        c.innerHTML='<div class="domain-empty">No observations</div>';
+    });
+    const uc=document.getElementById('unclassifiedCards');
+    if(uc&&uc!==container&&!uc.querySelector('.obs-card'))
+      document.getElementById('unclassifiedSection').style.display='none';
+  });
+}
+
+// ── EXPORT ──
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const teacher=getTeacher()||'Unknown Teacher';
+  const cls=getClass();
+  const date=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const post=document.getElementById('postNoteInput').value.trim();
+  let out=`CALIBR8 — CLASSROOM OBSERVATION REPORT\n${'═'.repeat(52)}\n`;
+  out+=`Teacher : ${teacher}\n`;
+  if(cls)out+=`Class   : ${cls}\n`;
+  out+=`Date    : ${date}\n\n`;
+  out+=`RAW TIMESTAMPED NOTES\n${'─'.repeat(52)}\n`;
+  notes.forEach(n=>{
+    const s=n.s==='pos'?'[+]':n.s==='neg'?'[-]':'[ ]';
+    out+=`${s} ${n.time}  ${n.text}\n`;
+  });
+  out+=`\nDANIELSON CLASSIFICATION\n${'─'.repeat(52)}\n`;
+  document.querySelectorAll('.domain-col').forEach(col=>{
+    const code=col.dataset.domain;
+    const cards=col.querySelectorAll('.obs-card');
+    out+=`\n[${code.toUpperCase()}] ${DOMAINS[code]?DOMAINS[code].label:code}\n`;
+    if(!cards.length){out+=`  — No observations\n`;}
+    else{cards.forEach(c=>{
+      const ts=c.querySelector('.obs-ts').textContent;
+      const tx=c.querySelector('.obs-text').textContent;
+      const s=c.classList.contains('pos')?'[+]':c.classList.contains('neg')?'[-]':'[ ]';
+      out+=`  ${s} ${ts}  ${tx}\n`;
+    });}
+  });
+  if(post)out+=`\nPOST-OBSERVATION NOTES\n${'─'.repeat(52)}\n${post}\n`;
+  out+=`\nLEGEND: [+] Positive  [-] Negative  [ ] Neutral\nGenerated by Calibr8\n`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([out],{type:'text/plain'}));
+  a.download=`Calibr8_${teacher.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+});
+
+// sync mobile fields to desktop
+['teacherNameM','classInfoM'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',e=>{
+    const target=id==='teacherNameM'?'teacherName':'classInfo';
+    document.getElementById(target).value=e.target.value;
+  });
+});
+</script>
+</body>
+</html>
